@@ -8,7 +8,27 @@
         <title>Math Plotter</title>
     </head>
     <body>
+        <div>
+            <form id="form">
+                <div>
+                    <label for="equation">Equation</label>
+                    <input id="equation" name="equation" type="text" required>
+                </div>
+                <div>
+                    <label for="xmin">x min</label>
+                    <input id="xmin" name="xmin" type="number" value="-10" required>
+                    <label for="xmax">x max</label>
+                    <input id="xmax" name="xmax" type="number" value="10" required>
+                    <label for="ymin">y min</label>
+                    <input id="ymin" name="ymin" type="number" value="-10" required>
+                    <label for="ymax">y max</label>
+                    <input id="ymax" name="ymax" type="number" value="10" required>
+                </div>
+                <button onclick="render">Graph</button>
+            </form>
+            <canvas id="graph-window" width="800px" height="500px"></canvas>
+        </div>
         
-    <script src="./main.js"></script>
+        <script src="./main.js"></script>
     </body>
 </html>
