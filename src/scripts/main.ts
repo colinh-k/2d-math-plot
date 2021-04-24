@@ -1,10 +1,9 @@
+import {tokenize} from './tokenizer';
+
+tokenize('2x + 3 * sinx');
+
 const canvas = <HTMLCanvasElement>document.getElementById('graph-window');
 const ctx = canvas.getContext('2d');
-
-// let xmin: number,
-//     xmax: number,
-//     ymin: number,
-//     ymax: number;
 
 const equationField = <HTMLInputElement>document.getElementById('equation');
 const xminField = <HTMLInputElement>document.getElementById('xmin');
