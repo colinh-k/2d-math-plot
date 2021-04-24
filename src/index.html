@@ -5,11 +5,14 @@
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <link rel="stylesheet" href="./style.css">
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/9.3.2/math.js"></script>
         <title>Math Plotter</title>
     </head>
     <body>
+        
         <div>
-            <form id="form">
+            <input id="equation-field">
+            <!-- <form id="form">
                 <div>
                     <label for="equation">Equation</label>
                     <input id="equation" name="equation" type="text" required>
@@ -25,12 +28,9 @@
                     <input id="ymax" name="ymax" type="number" value="10" required>
                 </div>
                 <button onclick="render">Graph</button>
-            </form>
+            </form> -->
             <canvas id="graph-window" width="800px" height="500px"></canvas>
         </div>
-        
-        <script type='module' src="./scripts/rules.js"></script>
-        <script type='module' src="./scripts/tokenizer.js"></script>
         <script type='module' src="./scripts/main.js"></script>
     </body>
 </html>

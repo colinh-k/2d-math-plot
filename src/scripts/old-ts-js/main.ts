@@ -1,6 +1,6 @@
-import {tokenize} from './tokenizer';
+// import {tokenize} from './tokenizer';
 
-tokenize('2x + 3 * sinx');
+// tokenize('2x + 3 * sinx');
 
 const canvas = <HTMLCanvasElement>document.getElementById('graph-window');
 const ctx = canvas.getContext('2d');
