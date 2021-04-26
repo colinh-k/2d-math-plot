@@ -1,4 +1,10 @@
 const equationField = document.getElementById('equation-field');
+const xminField = document.getElementById('xmin');
+const xmaxField = document.getElementById('xmax');
+const yminField = document.getElementById('ymin');
+const ymaxField = document.getElementById('ymax');
+
+const range = [xminField, xmaxField, yminField, ymaxField];
 // const canvas = document.getElementById('graph-window');
 // const ctx = canvas.getContext('2d');
 
@@ -20,7 +26,7 @@ window.onload = function () {
     graph = new Graph({  
         canvasId: "graph-window",  
         minX: -10,  
-        minY: -10,  
+        minY: -9,  
         maxX: 10,  
         maxY: 10,  
         unitsPerTick: 1  
@@ -39,6 +45,70 @@ window.onload = function () {
             return evaluateFunction(x)
             // return test(x);
         }, "black", 3);  
+    });
+
+    xminField.addEventListener('change', event => {
+        const newX = Number(xminField.value);
+
+        if (newX >= -1) {
+            graph.minX = -1;   
+            xminField.value = -1;
+        } else {
+            graph.minX = newX;
+        }
+        
+        graph.reCalculate();
+        graph.drawEquation((x) => {
+            return evaluateFunction(x);
+        }, "black", 3);
+    });
+
+    xmaxField.addEventListener('change', event => {
+        const newX = Number(xmaxField.value);
+
+        if (newX <= 1) {
+            graph.maxX = 1;   
+            xmaxField.value = 1;
+        } else {
+            graph.maxX = newX;
+        }
+
+        graph.reCalculate();
+        graph.drawEquation((x) => {
+            return evaluateFunction(x);
+        }, "black", 3);
+    });
+
+    yminField.addEventListener('change', event => {
+        const newY = -Number(yminField.value);
+
+        if (newY <= 1) {
+            graph.maxY = 1;   
+            yminField.value = -1;
+        } else {
+            graph.maxY = newY;
+        }
+
+        graph.reCalculate();
+        graph.drawEquation((x) => {
+            return evaluateFunction(x);
+        }, "black", 3);
+    });
+
+    ymaxField.addEventListener('change', event => {
+        const newY = -Number(ymaxField.value);
+
+        if (newY >= -1) {
+            graph.minY = -1;   
+            ymaxField.value = 1;
+        } else {
+            graph.minY = newY;
+        }
+
+        graph.reCalculate();
+        graph.drawEquation((x) => {
+            return evaluateFunction(x);
+        }, "black", 3);
     });
 }; 
 
@@ -79,6 +149,17 @@ class Graph {
         this.drawXAxis();
         this.drawYAxis();
     }
+    reCalculate() {
+        this.rangeX = this.maxX - this.minX;
+        this.rangeY = Math.abs(this.maxY - this.minY);
+        this.unitX = this.canvas.width / this.rangeX;
+        this.unitY = this.canvas.height / this.rangeY;
+        this.centerY = Math.round(Math.abs(this.minY / this.rangeY) * this.canvas.height);
+        this.centerX = Math.round(Math.abs(this.minX / this.rangeX) * this.canvas.width);
+        this.iteration = (this.maxX - this.minX) / 1000;
+        this.scaleX = this.canvas.width / this.rangeX;
+        this.scaleY = this.canvas.height / this.rangeY;
+    }
     drawXAxis() {
         let context = this.context;
         context.save();
@@ -95,6 +176,8 @@ class Graph {
         context.font = this.font;
         context.textAlign = "center";
         context.textBaseline = "top";
+
+        // const tickSkip = (this.maxX - this.minX > 50) ? 2 : 1;
         
         // draw left tick marks  
         xPos = this.centerX - xPosIncrement;
@@ -169,7 +252,6 @@ class Graph {
         this.context.clearRect(0,0,this.canvas.width, this.canvas.height);  
         this.drawXAxis();
         this.drawYAxis();
-        // context.save();
         this.transformContext();
         
         context.beginPath();
