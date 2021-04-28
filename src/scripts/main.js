@@ -4,6 +4,25 @@ const xmaxField = document.getElementById('xmax');
 const yminField = document.getElementById('ymin');
 const ymaxField = document.getElementById('ymax');
 
+const domainFields = [
+    {
+        field: xminField,
+        domainElement: 'minX'
+    },
+    {
+        field: xmaxField,
+        domainElement: 'maxX'
+    },
+    {
+        field: yminField,
+        domainElement: 'maxY'
+    },
+    {
+        field: ymaxField,
+        domainElement: 'minY'
+    },
+]
+
 const range = [xminField, xmaxField, yminField, ymaxField];
 // const canvas = document.getElementById('graph-window');
 // const ctx = canvas.getContext('2d');
@@ -41,80 +60,26 @@ window.onload = function () {
         expression = equationField.value;
         // setHashFromExpr();
         graph.drawEquation((x) => {
-            // console.log(evaluateFunction(x));
             return evaluateFunction(x)
-            // return test(x);
         }, "black", 3);  
     });
 
-    xminField.addEventListener('change', event => {
-        const newX = Number(xminField.value);
-
-        // if (newX >= 1) {
-        //     graph.minX = 1;   
-        //     xminField.value = -1;
-        // } else {
-        //     graph.minX = newX;
-        // }
-
-        graph.minX = newX;
-        
-        graph.reCalculate();
-        graph.drawEquation((x) => {
-            return evaluateFunction(x);
-        }, "black", 3);
-    });
-
-    xmaxField.addEventListener('change', event => {
-        const newX = Number(xmaxField.value);
-
-        // if (newX <= -1) {
-        //     graph.maxX = -1;   
-        //     xmaxField.value = 1;
-        // } else {
-        //     graph.maxX = newX;
-        // }
-
-        graph.maxX = newX;
-
-        graph.reCalculate();
-        graph.drawEquation((x) => {
-            return evaluateFunction(x);
-        }, "black", 3);
-    });
-
-    yminField.addEventListener('change', event => {
-        const newY = -Number(yminField.value);
-
-        if (newY <= 1) {
-            graph.maxY = 1;   
-            yminField.value = -1;
-        } else {
-            graph.maxY = newY;
-        }
-
-        graph.reCalculate();
-        graph.drawEquation((x) => {
-            return evaluateFunction(x);
-        }, "black", 3);
-    });
-
-    ymaxField.addEventListener('change', event => {
-        const newY = -Number(ymaxField.value);
-
-        if (newY >= -1) {
-            graph.minY = -1;   
-            ymaxField.value = 1;
-        } else {
-            graph.minY = newY;
-        }
-
-        graph.reCalculate();
-        graph.drawEquation((x) => {
-            return evaluateFunction(x);
-        }, "black", 3);
-    });
+    // only goes to 2 since y fields require different logic
+    for (let i = 0; i < domainFields.length; i++) {
+        domainFields[i].field.addEventListener('change', event => {
+            changeDomainElement(domainFields[i].field, domainFields[i].domainElement);
+        });
+    }
 }; 
+
+// get the value of input element and store it in the given domain element in graph
+function changeDomainElement(inputElement, domainElement) {
+    graph[domainElement] = Number(inputElement.value) * ((domainElement.includes('Y')) ? -1 : 1);
+    graph.reCalculate();
+    graph.drawEquation((x) => {
+        return evaluateFunction(x);
+    }, "black", 3);
+}
 
 // return the y coordinate in the math space of the given argument number
 function evaluateFunction(arg) {
@@ -159,7 +124,7 @@ class Graph {
         this.unitX = this.canvas.width / this.rangeX;
         this.unitY = this.canvas.height / this.rangeY;
 
-        this.centerY = Math.round(Math.abs(this.minY / this.rangeY) * this.canvas.height);
+        this.centerY = -Math.round((this.minY / this.rangeY) * this.canvas.height);
         this.centerX = -Math.round((this.minX / this.rangeX) * this.canvas.width);
         this.iteration = (this.maxX - this.minX) / 1000;
         this.scaleX = this.canvas.width / this.rangeX;
@@ -167,7 +132,6 @@ class Graph {
 
         // console.log('vals', this.minX, this.maxX, this.rangeX);
         // console.log('vals', this.unitX); // error when xmax - xmin <= 0; unitx = infinity
-        console.log(this.centerX);
     }
     drawXAxis() {
         let context = this.context;
@@ -185,8 +149,6 @@ class Graph {
         context.font = this.font;
         context.textAlign = "center";
         context.textBaseline = "top";
-
-        // const tickSkip = (this.maxX - this.minX > 50) ? 2 : 1;
         
         // draw left tick marks  
         xPos = this.centerX - xPosIncrement;
@@ -237,7 +199,6 @@ class Graph {
         const stickAxisLeft = this.centerX <= 0;
         const stickAxisRight = this.centerX >= this.canvas.width;
         const xOffsetDir = (stickAxisLeft) ? 1 : -1;
-        console.log(xOffsetDir, this.centerX);
 
         let xAxisPos = stickAxisLeft ? 0 : stickAxisRight ? this.canvas.width : this.centerX;
 
@@ -267,14 +228,6 @@ class Graph {
             unit += this.unitsPerTick;
             yPos = Math.round(yPos - yPosIncrement);
         }
-        // while (yPos > 0) {
-        //     context.moveTo(this.centerX - this.tickSize / 2, yPos);
-        //     context.lineTo(this.centerX + this.tickSize / 2, yPos);
-        //     context.stroke();
-        //     context.fillText(unit, this.centerX - this.tickSize / 2 - 3, yPos);
-        //     unit += this.unitsPerTick;
-        //     yPos = Math.round(yPos - yPosIncrement);
-        // }
         
         // draw bottom tick marks  
         yPos = this.centerY + yPosIncrement;
