@@ -233,7 +233,7 @@ class Graph {
         // draw top tick marks  
         yPos = this.centerY - yPosIncrement;
 
-        // const distToRight = Math.abs(this.centerX - this.canvas.width);
+        // vars to determine when y axis should stick to sides and which side of the axis to put labels
         const stickAxisLeft = this.centerX <= 0;
         const stickAxisRight = this.centerX >= this.canvas.width;
         const xOffsetDir = (stickAxisLeft) ? 1 : -1;
@@ -247,9 +247,8 @@ class Graph {
             context.lineTo(xAxisPos + this.tickSize / 2, yPos);
             context.stroke();
 
-            let x;
-
             let xOffset = (unit + '').replace('.', '').length;
+            let x = (this.tickSize / 2 * xOffsetDir) + (xOffset * xOffsetDir);
             if (stickAxisLeft) {
                 xOffset *= 4;
                 xOffset += 6;
@@ -257,11 +256,11 @@ class Graph {
             } else if (stickAxisRight) {
                 xOffset *= 2;
                 xOffset += 1;
-                x = this.canvas.width + (this.tickSize / 2 * xOffsetDir) + (xOffset * xOffsetDir);
+                x += this.canvas.width;
             } else {
                 xOffset *= 2;
                 xOffset += 1;
-                x = this.centerX + (this.tickSize / 2 * xOffsetDir) + (xOffset * xOffsetDir);
+                x += this.centerX;
             }
 
             context.fillText(unit, x, yPos);
@@ -281,10 +280,27 @@ class Graph {
         yPos = this.centerY + yPosIncrement;
         unit = -1 * this.unitsPerTick;
         while (yPos < this.canvas.height) {
-            context.moveTo(this.centerX - this.tickSize / 2, yPos);
-            context.lineTo(this.centerX + this.tickSize / 2, yPos);
+            context.moveTo(xAxisPos - this.tickSize / 2, yPos);
+            context.lineTo(xAxisPos + this.tickSize / 2, yPos);
             context.stroke();
-            context.fillText(unit, this.centerX - this.tickSize / 2 - 3, yPos);
+
+            let xOffset = (unit + '').replace('.', '').length;
+            let x = (this.tickSize / 2 * xOffsetDir) + (xOffset * xOffsetDir);
+            if (stickAxisLeft) {
+                xOffset *= 4;
+                xOffset += 6;
+                x = (this.tickSize / 2 * xOffsetDir) + (xOffset * xOffsetDir);
+            } else if (stickAxisRight) {
+                xOffset *= 2;
+                xOffset += 1;
+                x += this.canvas.width;
+            } else {
+                xOffset *= 2;
+                xOffset += 1;
+                x += this.centerX;
+            }
+
+            context.fillText(unit, x, yPos);
             unit -= this.unitsPerTick;
             yPos = Math.round(yPos + yPosIncrement);
         }
