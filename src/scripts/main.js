@@ -50,12 +50,14 @@ window.onload = function () {
     xminField.addEventListener('change', event => {
         const newX = Number(xminField.value);
 
-        if (newX >= -1) {
-            graph.minX = -1;   
-            xminField.value = -1;
-        } else {
-            graph.minX = newX;
-        }
+        // if (newX >= 1) {
+        //     graph.minX = 1;   
+        //     xminField.value = -1;
+        // } else {
+        //     graph.minX = newX;
+        // }
+
+        graph.minX = newX;
         
         graph.reCalculate();
         graph.drawEquation((x) => {
@@ -66,12 +68,14 @@ window.onload = function () {
     xmaxField.addEventListener('change', event => {
         const newX = Number(xmaxField.value);
 
-        if (newX <= 1) {
-            graph.maxX = 1;   
-            xmaxField.value = 1;
-        } else {
-            graph.maxX = newX;
-        }
+        // if (newX <= -1) {
+        //     graph.maxX = -1;   
+        //     xmaxField.value = 1;
+        // } else {
+        //     graph.maxX = newX;
+        // }
+
+        graph.maxX = newX;
 
         graph.reCalculate();
         graph.drawEquation((x) => {
@@ -154,11 +158,16 @@ class Graph {
         this.rangeY = Math.abs(this.maxY - this.minY);
         this.unitX = this.canvas.width / this.rangeX;
         this.unitY = this.canvas.height / this.rangeY;
+
         this.centerY = Math.round(Math.abs(this.minY / this.rangeY) * this.canvas.height);
-        this.centerX = Math.round(Math.abs(this.minX / this.rangeX) * this.canvas.width);
+        this.centerX = -Math.round((this.minX / this.rangeX) * this.canvas.width);
         this.iteration = (this.maxX - this.minX) / 1000;
         this.scaleX = this.canvas.width / this.rangeX;
         this.scaleY = this.canvas.height / this.rangeY;
+
+        // console.log('vals', this.minX, this.maxX, this.rangeX);
+        // console.log('vals', this.unitX); // error when xmax - xmin <= 0; unitx = infinity
+        console.log(this.centerX);
     }
     drawXAxis() {
         let context = this.context;
@@ -223,15 +232,50 @@ class Graph {
         
         // draw top tick marks  
         yPos = this.centerY - yPosIncrement;
+
+        // const distToRight = Math.abs(this.centerX - this.canvas.width);
+        const stickAxisLeft = this.centerX <= 0;
+        const stickAxisRight = this.centerX >= this.canvas.width;
+        const xOffsetDir = (stickAxisLeft) ? 1 : -1;
+        console.log(xOffsetDir, this.centerX);
+
+        let xAxisPos = stickAxisLeft ? 0 : stickAxisRight ? this.canvas.width : this.centerX;
+
         unit = this.unitsPerTick;
         while (yPos > 0) {
-            context.moveTo(this.centerX - this.tickSize / 2, yPos);
-            context.lineTo(this.centerX + this.tickSize / 2, yPos);
+            context.moveTo(xAxisPos - this.tickSize / 2, yPos);
+            context.lineTo(xAxisPos + this.tickSize / 2, yPos);
             context.stroke();
-            context.fillText(unit, this.centerX - this.tickSize / 2 - 3, yPos);
+
+            let x;
+
+            let xOffset = (unit + '').replace('.', '').length;
+            if (stickAxisLeft) {
+                xOffset *= 4;
+                xOffset += 6;
+                x = (this.tickSize / 2 * xOffsetDir) + (xOffset * xOffsetDir);
+            } else if (stickAxisRight) {
+                xOffset *= 2;
+                xOffset += 1;
+                x = this.canvas.width + (this.tickSize / 2 * xOffsetDir) + (xOffset * xOffsetDir);
+            } else {
+                xOffset *= 2;
+                xOffset += 1;
+                x = this.centerX + (this.tickSize / 2 * xOffsetDir) + (xOffset * xOffsetDir);
+            }
+
+            context.fillText(unit, x, yPos);
             unit += this.unitsPerTick;
             yPos = Math.round(yPos - yPosIncrement);
         }
+        // while (yPos > 0) {
+        //     context.moveTo(this.centerX - this.tickSize / 2, yPos);
+        //     context.lineTo(this.centerX + this.tickSize / 2, yPos);
+        //     context.stroke();
+        //     context.fillText(unit, this.centerX - this.tickSize / 2 - 3, yPos);
+        //     unit += this.unitsPerTick;
+        //     yPos = Math.round(yPos - yPosIncrement);
+        // }
         
         // draw bottom tick marks  
         yPos = this.centerY + yPosIncrement;
