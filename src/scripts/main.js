@@ -4,25 +4,6 @@ const xmaxField = document.getElementById('xmax');
 const yminField = document.getElementById('ymin');
 const ymaxField = document.getElementById('ymax');
 
-const domainFields = [
-    {
-        field: xminField,
-        domainElement: 'minX'
-    },
-    {
-        field: xmaxField,
-        domainElement: 'maxX'
-    },
-    {
-        field: yminField,
-        domainElement: 'maxY'
-    },
-    {
-        field: ymaxField,
-        domainElement: 'minY'
-    },
-]
-
 const range = [xminField, xmaxField, yminField, ymaxField];
 // const canvas = document.getElementById('graph-window');
 // const ctx = canvas.getContext('2d');
@@ -64,17 +45,36 @@ window.onload = function () {
         }, "black", 3);  
     });
 
-    // only goes to 2 since y fields require different logic
-    for (let i = 0; i < domainFields.length; i++) {
-        domainFields[i].field.addEventListener('change', event => {
-            changeDomainElement(domainFields[i].field, domainFields[i].domainElement);
-        });
+    const domainFields = [
+        {
+            field: xminField,
+            changeFunc: graph.setXMin
+        },
+        {
+            field: xmaxField,
+            changeFunc: graph.setXMax
+        },
+        {
+            field: yminField,
+            changeFunc: graph.setYMin
+        },
+        {
+            field: ymaxField,
+            changeFunc: graph.setYMax
+        },
+    ]
+
+    for (const domainField of domainFields) {
+        domainField.field.addEventListener('change', event => {
+            changeDomainElement(domainField.field, domainField.changeFunc);
+        })
     }
 }; 
 
-// get the value of input element and store it in the given domain element in graph
-function changeDomainElement(inputElement, domainElement) {
-    graph[domainElement] = Number(inputElement.value) * ((domainElement.includes('Y')) ? -1 : 1);
+// get the value of input element and pass it to the set function 
+function changeDomainElement(inputElement, setFunc) {
+    // func.call() sets this reference in the function, followed by func args
+    setFunc.call(graph, Number(inputElement.value));
     graph.reCalculate();
     graph.drawEquation((x) => {
         return evaluateFunction(x);
@@ -132,6 +132,23 @@ class Graph {
 
         // console.log('vals', this.minX, this.maxX, this.rangeX);
         // console.log('vals', this.unitX); // error when xmax - xmin <= 0; unitx = infinity
+    }
+    // set min x value on graph window
+    setXMin(newX) {
+        console.log(this);
+        this.minX = newX;
+    }
+    // set max x value on graph window
+    setXMax(newX) {
+        this.maxX = newX;
+    }
+    // set min y value on graph window
+    setYMin(newY) {
+        this.maxY = -newY;
+    }
+    // set max y value on graph window 
+    setYMax(newY) {
+        this.minY = -newY;
     }
     drawXAxis() {
         let context = this.context;
