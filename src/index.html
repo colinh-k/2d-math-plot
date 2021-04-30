@@ -10,38 +10,32 @@
 </head>
 <body>
     <div id="content-container">
-        <div id="input-wrapper">
-            <div id="input-container">
+        <div id="input-container">
+            <div id="equation-container">
                 <label for="equation">Equation</label>
                 <input id="equation-field">
-                
+            </div>
+            
+            <div class="xmin-container">
                 <label for="xmin">x min</label>
                 <input id="xmin" name="xmin" type="number" value="-10" required>
+            </div>
+
+            <div class="xmax-container">
                 <label for="xmax">x max</label>
                 <input id="xmax" name="xmax" type="number" value="10" required>
+            </div>
+
+            <div class="ymin-container">
                 <label for="ymin">y min</label>
                 <input id="ymin" name="ymin" type="number" value="-10" required>
+            </div>
+
+            <div class="ymax-container">
                 <label for="ymax">y max</label>
                 <input id="ymax" name="ymax" type="number" value="10" required>
             </div>
         </div>
-        <!-- <form id="form">
-            <div>
-                <label for="equation">Equation</label>
-                <input id="equation" name="equation" type="text" required>
-            </div>
-            <div>
-                <label for="xmin">x min</label>
-                <input id="xmin" name="xmin" type="number" value="-10" required>
-                <label for="xmax">x max</label>
-                <input id="xmax" name="xmax" type="number" value="10" required>
-                <label for="ymin">y min</label>
-                <input id="ymin" name="ymin" type="number" value="-10" required>
-                <label for="ymax">y max</label>
-                <input id="ymax" name="ymax" type="number" value="10" required>
-            </div>
-            <button onclick="render">Graph</button>
-        </form> -->
         <canvas id="graph-window" width="800px" height="800px"></canvas>
     </div>
     <script type='module' src="./scripts/graph.js"></script>

@@ -1,3 +1,7 @@
+:root {
+    --graph-dimension: 600px;
+}
+
 * {
     margin: 0;
     padding: 0;
@@ -12,33 +16,36 @@ body {
     justify-content: center;
 }
 
-#input-wrapper input, #input-wrapper label {
+#content-container input, #content-container label {
     display: block;
     font-family: sans-serif;
     font-size: 25px;
 }
 
-#input-wrapper label {
-    margin: 10px 0;
+#content-container label {
+    /* margin: 10px 0; */
 }
 
-#input-wrapper input {
-    margin-bottom: 30px;
+#content-container label, #content-container input {
+    width: 100%;
+}
+
+#content-container input {
+    /* margin-bottom: 30px; */
     border-radius: 10px;
     border: 3px solid black;
-    padding: 10px;
-}
-
-#input-wrapper {
-    height: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    /* border: 1px solid red; */
+    padding: 8px;
 }
 
 #input-container {
-
+    display: grid;
+    grid-template-rows: auto auto auto auto auto;
+    grid-template-columns: auto;
+    grid-template-areas: "equation"
+    "xmax"
+    "xmin"
+    "ymax"
+    "ymin";
 }
 
 #content-container {
@@ -47,9 +54,49 @@ body {
     grid-gap: 50px;
 }
 
+#xmin-container {
+    grid-area: xmin;
+}
+#ymin-container {
+    grid-area: ymin;
+}
+#xmax-container {
+    grid-area: xmax;
+}
+#ymax-container {
+    grid-area: ymax;
+}
+#equation-container {
+    grid-area: equation;
+}
+
 #graph-window {
     border: 3px solid black;
     border-radius: 10px;
-    /* width: 500px;
-    height: 500px; */
+    justify-self: center;
+    align-self: center;
+    width: var(--graph-dimension);
+    height: var(--graph-dimension);
+}
+
+@media only screen and (max-width: 1000px) {
+    #input-container {
+        grid-template-columns: 250px 250px;
+        grid-template-rows: auto auto auto;
+        grid-template-areas: "equation equation"
+        "xmax ymax"
+        "xmin ymin";
+        grid-gap: 10px;
+        justify-items: stretch;
+        /* border: 1px solid green; */
+    }
+    
+    #content-container {
+        grid-template-columns: auto;
+        grid-template-rows: auto auto;
+    }
+    
+    #graph-window {
+        --graph-dimension: 500px;
+    }
 }

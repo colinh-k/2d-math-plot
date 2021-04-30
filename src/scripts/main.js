@@ -83,28 +83,28 @@ function evaluateFunction(arg) {
     return math.evaluate(expression, scope);
 }
 
-function getHash() {
-    return location.hash.substr(1);
-}
+// function getHash() {
+//     return location.hash.substr(1);
+// }
 
-// set hash value of locator
-function setHash(val) {
-    location.hash = val;
-}
+// // set hash value of locator
+// function setHash(val) {
+//     location.hash = val;
+// }
 
-function setHashFromExpr() {
-    setHash(expression);
-}
+// function setHashFromExpr() {
+//     setHash(expression);
+// }
 
-function initExprFromHash() {
-    let hash = getHash();
-    // if no hash
-    if (hash) {
-        expression = hash;
-    } else {
-        expression = 'sin(x)';
-        setHashFromExpr();
-    }
-    equationField.value = expression;
-    graph.drawEquation(evaluateFunction, "green", 3);  
-}
+// function initExprFromHash() {
+//     let hash = getHash();
+//     // if no hash
+//     if (hash) {
+//         expression = hash;
+//     } else {
+//         expression = 'sin(x)';
+//         setHashFromExpr();
+//     }
+//     equationField.value = expression;
+//     graph.drawEquation(evaluateFunction, "green", 3);  
+// }
