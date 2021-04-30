@@ -44,7 +44,7 @@ window.onload = function () {
             return evaluateFunction(x)
         }, "black", 3);  
     });
-
+    
     const domainFields = [
         {
             field: xminField,
@@ -63,7 +63,7 @@ window.onload = function () {
             changeFunc: graph.setYMax
         },
     ]
-
+    
     for (const domainField of domainFields) {
         domainField.field.addEventListener('change', event => {
             changeDomainElement(domainField.field, domainField.changeFunc);
@@ -75,7 +75,7 @@ window.onload = function () {
 function changeDomainElement(inputElement, setFunc) {
     // func.call() sets this reference in the function, followed by func args
     setFunc.call(graph, Number(inputElement.value));
-    graph.reCalculate();
+    graph.calculateParams();
     graph.drawEquation((x) => {
         return evaluateFunction(x);
     }, "black", 3);
@@ -88,14 +88,14 @@ function evaluateFunction(arg) {
 }
 
 class Graph {
-    constructor(con) {
+    constructor(config) {
         // user defined properties  
-        this.canvas = document.getElementById(con.canvasId);
-        this.minX = con.minX;
-        this.minY = con.minY;
-        this.maxX = con.maxX;
-        this.maxY = con.maxY;
-        this.unitsPerTick = con.unitsPerTick;
+        this.canvas = document.getElementById(config.canvasId);
+        this.minX = config.minX;
+        this.minY = config.minY;
+        this.maxX = config.maxX;
+        this.maxY = config.maxY;
+        this.unitsPerTick = config.unitsPerTick;
         
         // constants  
         this.axisColor = "#aaa";
@@ -104,52 +104,59 @@ class Graph {
         
         // relationships  
         this.context = this.canvas.getContext("2d");
-        this.rangeX = this.maxX - this.minX;
-        this.rangeY = this.maxY - this.minY;
-        this.unitX = this.canvas.width / this.rangeX;
-        this.unitY = this.canvas.height / this.rangeY;
-        this.centerY = Math.round(Math.abs(this.minY / this.rangeY) * this.canvas.height);
-        this.centerX = Math.round(Math.abs(this.minX / this.rangeX) * this.canvas.width);
-        this.iteration = (this.maxX - this.minX) / 1000;
-        this.scaleX = this.canvas.width / this.rangeX;
-        this.scaleY = this.canvas.height / this.rangeY;
+        // this.rangeX = this.maxX - this.minX;
+        // this.rangeY = this.maxY - this.minY;
+        // this.unitX = this.canvas.width / this.rangeX;
+        // this.unitY = this.canvas.height / this.rangeY;
+        // this.centerY = Math.round(Math.abs(this.minY / this.rangeY) * this.canvas.height);
+        // this.centerX = Math.round(Math.abs(this.minX / this.rangeX) * this.canvas.width);
+        // this.iteration = (this.maxX - this.minX) / 1000;
+        // this.scaleX = this.canvas.width / this.rangeX;
+        // this.scaleY = this.canvas.height / this.rangeY;
+        
+        this.calculateParams();
         
         // draw x and y axis  
         this.drawXAxis();
         this.drawYAxis();
     }
-    reCalculate() {
+    
+    calculateParams() {
         this.rangeX = this.maxX - this.minX;
         this.rangeY = Math.abs(this.maxY - this.minY);
         this.unitX = this.canvas.width / this.rangeX;
         this.unitY = this.canvas.height / this.rangeY;
-
+        
         this.centerY = -Math.round((this.minY / this.rangeY) * this.canvas.height);
         this.centerX = -Math.round((this.minX / this.rangeX) * this.canvas.width);
         this.iteration = (this.maxX - this.minX) / 1000;
         this.scaleX = this.canvas.width / this.rangeX;
         this.scaleY = this.canvas.height / this.rangeY;
-
+        
         // console.log('vals', this.minX, this.maxX, this.rangeX);
         // console.log('vals', this.unitX); // error when xmax - xmin <= 0; unitx = infinity
     }
+    
     // set min x value on graph window
     setXMin(newX) {
-        console.log(this);
         this.minX = newX;
     }
+    
     // set max x value on graph window
     setXMax(newX) {
         this.maxX = newX;
     }
+    
     // set min y value on graph window
     setYMin(newY) {
         this.maxY = -newY;
     }
+    
     // set max y value on graph window 
     setYMax(newY) {
         this.minY = -newY;
     }
+    
     drawXAxis() {
         let context = this.context;
         context.save();
@@ -169,12 +176,24 @@ class Graph {
         
         // draw left tick marks  
         xPos = this.centerX - xPosIncrement;
+
+        // vars to determine when x axis should stick to sides and which side of the axis to put labels
+        const stickAxisTop = this.centerY <= 0;
+        const stickAxisBottom = this.centerY >= this.canvas.height;
+        const yOffsetDir = (stickAxisTop) ? -1 : 1;
+        
+        // the y position of the x axis
+        let yAxisPos = stickAxisTop ? 0 : stickAxisBottom ? this.canvas.height : this.centerY;
+
         unit = -1 * this.unitsPerTick;
         while (xPos > 0) {
-            context.moveTo(xPos, this.centerY - this.tickSize / 2);
-            context.lineTo(xPos, this.centerY + this.tickSize / 2);
+            context.moveTo(xPos, yAxisPos - this.tickSize / 2);
+            context.lineTo(xPos, yAxisPos + this.tickSize / 2);
             context.stroke();
-            context.fillText(unit, xPos, this.centerY + this.tickSize / 2 + 3);
+
+            const yPos = this.calculateYPos(yOffsetDir, stickAxisTop, stickAxisBottom);
+
+            context.fillText(unit, xPos, yPos);
             unit -= this.unitsPerTick;
             xPos = Math.round(xPos - xPosIncrement);
         }
@@ -183,15 +202,19 @@ class Graph {
         xPos = this.centerX + xPosIncrement;
         unit = this.unitsPerTick;
         while (xPos < this.canvas.width) {
-            context.moveTo(xPos, this.centerY - this.tickSize / 2);
-            context.lineTo(xPos, this.centerY + this.tickSize / 2);
+            context.moveTo(xPos, yAxisPos - this.tickSize / 2);
+            context.lineTo(xPos, yAxisPos + this.tickSize / 2);
             context.stroke();
-            context.fillText(unit, xPos, this.centerY + this.tickSize / 2 + 3);
+
+            const yPos = this.calculateYPos(yOffsetDir, stickAxisTop, stickAxisBottom);
+
+            context.fillText(unit, xPos, yPos);
             unit += this.unitsPerTick;
             xPos = Math.round(xPos + xPosIncrement);
         }
         context.restore();
     }
+    
     drawYAxis() {
         let context = this.context;
         context.save();
@@ -211,37 +234,23 @@ class Graph {
         
         // draw top tick marks  
         yPos = this.centerY - yPosIncrement;
-
+        
         // vars to determine when y axis should stick to sides and which side of the axis to put labels
         const stickAxisLeft = this.centerX <= 0;
         const stickAxisRight = this.centerX >= this.canvas.width;
         const xOffsetDir = (stickAxisLeft) ? 1 : -1;
-
+        
         let xAxisPos = stickAxisLeft ? 0 : stickAxisRight ? this.canvas.width : this.centerX;
-
+        
         unit = this.unitsPerTick;
         while (yPos > 0) {
             context.moveTo(xAxisPos - this.tickSize / 2, yPos);
             context.lineTo(xAxisPos + this.tickSize / 2, yPos);
             context.stroke();
 
-            let xOffset = (unit + '').replace('.', '').length;
-            let x = (this.tickSize / 2 * xOffsetDir) + (xOffset * xOffsetDir);
-            if (stickAxisLeft) {
-                xOffset *= 4;
-                xOffset += 6;
-                x = (this.tickSize / 2 * xOffsetDir) + (xOffset * xOffsetDir);
-            } else if (stickAxisRight) {
-                xOffset *= 2;
-                xOffset += 1;
-                x += this.canvas.width;
-            } else {
-                xOffset *= 2;
-                xOffset += 1;
-                x += this.centerX;
-            }
-
-            context.fillText(unit, x, yPos);
+            const xPos = this.calculateXPos(unit, xOffsetDir, stickAxisLeft, stickAxisRight);
+            
+            context.fillText(unit, xPos, yPos);
             unit += this.unitsPerTick;
             yPos = Math.round(yPos - yPosIncrement);
         }
@@ -254,28 +263,42 @@ class Graph {
             context.lineTo(xAxisPos + this.tickSize / 2, yPos);
             context.stroke();
 
-            let xOffset = (unit + '').replace('.', '').length;
-            let x = (this.tickSize / 2 * xOffsetDir) + (xOffset * xOffsetDir);
-            if (stickAxisLeft) {
-                xOffset *= 4;
-                xOffset += 6;
-                x = (this.tickSize / 2 * xOffsetDir) + (xOffset * xOffsetDir);
-            } else if (stickAxisRight) {
-                xOffset *= 2;
-                xOffset += 1;
-                x += this.canvas.width;
-            } else {
-                xOffset *= 2;
-                xOffset += 1;
-                x += this.centerX;
-            }
-
-            context.fillText(unit, x, yPos);
+            const xPos = this.calculateXPos(unit, xOffsetDir, stickAxisLeft, stickAxisRight);
+            
+            context.fillText(unit, xPos, yPos);
             unit -= this.unitsPerTick;
             yPos = Math.round(yPos + yPosIncrement);
         }
         context.restore();
     }
+
+    // given relevant params, calculate the yposition of the x axis label
+    calculateYPos(yOffsetDir, stickAxisTop, stickAxisBottom) {
+        let y = (this.tickSize / 2 * yOffsetDir);
+        if (stickAxisBottom) {
+            y += (10 * yOffsetDir) + this.canvas.height - 43;
+        } else if (stickAxisTop) {
+            y += 20;
+        } else {
+            y += this.centerY;
+        }
+        return y;
+    }
+    
+    // given relevant params, calculate the xposition of the y axis label
+    calculateXPos(unit, xOffsetDir, stickAxisLeft, stickAxisRight) {
+        let xOffset = (unit + '').replace('.', '').length;
+        let x = (this.tickSize / 2 * xOffsetDir) + (xOffset * xOffsetDir);
+        if (stickAxisLeft) {
+            x += ((xOffset * 4 + 6) * xOffsetDir);
+        } else if (stickAxisRight) {
+            x += this.canvas.width;
+        } else {
+            x += this.centerX;
+        }
+        return x;
+    }
+    
     drawEquation(equation, color, thickness) {
         let context = this.context;
         context.save();
@@ -303,6 +326,7 @@ class Graph {
             context.restore();
         }     
     }
+    
     transformContext() {
         let context = this.context;
         
