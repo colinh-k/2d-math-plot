@@ -8,12 +8,23 @@
     box-sizing: border-box;
 }
 
+html, body {
+    height: 100%;
+    min-height: 100%;
+}
+
 body {
-    height: 100vh;
-    width: 100vw;
+    height: 100%;
+    width: 100%;
     display: flex;
-    align-items: center;
-    justify-content: center;
+    /* align-items: center;
+    justify-content: center; */
+    /* display: grid;
+    /* justify-items: center; */
+    /* justify-content: center;
+    align-content: center; */
+    /* align-items: center;
+    justify-content: center; */
 }
 
 /* make these elements non-selectable */
@@ -40,15 +51,19 @@ label, canvas {
 }
 
 #content-container input {
-    /* margin-bottom: 30px; */
     border-radius: 10px;
     border: 3px solid black;
     padding: 8px;
 }
 
 #input-container {
+    /* margin-top: 10px; */
+    /* margin: auto; */
+    /* align-self: safe center; */
     display: grid;
-    grid-template-rows: auto auto auto auto auto;
+    /* align-items:stretch; */
+    /* justify-content: stretch; */
+    grid-template-rows: 1fr 1fr 1fr 1fr 1fr;
     grid-template-columns: auto;
     grid-template-areas: "equation"
     "xmax"
@@ -58,9 +73,10 @@ label, canvas {
 }
 
 #content-container {
+    margin: auto;
     display: grid;
+    gap: 50px;
     grid-template-columns: auto auto;
-    grid-gap: 50px;
 }
 
 #xmin-container {
@@ -90,6 +106,7 @@ label, canvas {
 
 @media only screen and (max-width: 1000px) {
     #input-container {
+        margin-top: 20px;
         grid-template-columns: 250px 250px;
         grid-template-rows: auto auto auto;
         grid-template-areas: "equation equation"
