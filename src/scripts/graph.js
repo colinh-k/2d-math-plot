@@ -40,22 +40,34 @@ export default class Graph {
     
     // set min x value on graph window
     setXMin(newX) {
-        this.minX = newX;
+        if (newX < this.maxX) {
+            this.minX = newX;
+        }
+        return this.minX;
     }
     
     // set max x value on graph window
     setXMax(newX) {
-        this.maxX = newX;
+        if (newX > this.minX) {
+            this.maxX = newX;
+        }
+        return this.maxX;
     }
     
     // set min y value on graph window
     setYMin(newY) {
-        this.maxY = -newY;
+        if (newY < -this.minY) {
+            this.maxY = -newY;
+        }
+        return -this.maxY;
     }
     
     // set max y value on graph window 
     setYMax(newY) {
-        this.minY = -newY;
+        if (newY > -this.maxY) {
+            this.minY = -newY;
+        }
+        return -this.minY;
     }
     
     drawXAxis() {

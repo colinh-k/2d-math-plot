@@ -62,19 +62,21 @@ window.onload = function () {
     
     for (const domainField of domainFields) {
         domainField.field.addEventListener('change', event => {
-            changeDomainElement(domainField.field, domainField.changeFunc);
+            const val = changeDomainElement(domainField.field, domainField.changeFunc);
+            domainField.field.value = val;
         })
     }
 }; 
 
 // get the value of input element and pass it to the set function 
 function changeDomainElement(inputElement, setFunc) {
-    // func.call() sets this reference in the function, followed by func args
-    setFunc.call(graph, Number(inputElement.value));
+    // func.call() sets 'this' (the keyword) reference in the function, followed by func args
+    const val = setFunc.call(graph, Number(inputElement.value));
     graph.calculateParams();
     graph.drawEquation((x) => {
         return evaluateFunction(x);
     }, "black", 3);
+    return val;
 }
 
 // return the y coordinate in the math space of the given argument number
