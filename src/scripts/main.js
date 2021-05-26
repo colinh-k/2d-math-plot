@@ -25,7 +25,9 @@ window.onload = function () {
         minY: -10,  
         maxX: 10,  
         maxY: 10,  
-        unitsPerTick: 1  
+        // unitsPerTick: 5
+        unitsPerTickX: 2,
+        unitsPerTickY: 2
     });  
     
     graph.drawEquation((x) => {

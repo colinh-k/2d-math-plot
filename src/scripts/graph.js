@@ -6,11 +6,13 @@ export default class Graph {
         this.minY = config.minY;
         this.maxX = config.maxX;
         this.maxY = config.maxY;
-        this.unitsPerTick = config.unitsPerTick;
+        // this.unitsPerTick = config.unitsPerTick;
+        this.unitsPerTickX = config.unitsPerTickX;
+        this.unitsPerTickY = config.unitsPerTickY;
         
         // constants  
         this.axisColor = "#aaa";
-        this.font = "8pt Calibri";
+        this.font = "16pt Calibri";
         this.tickSize = 20;
         
         // relationships; initialize graph parameters
@@ -37,11 +39,16 @@ export default class Graph {
         // console.log('vals', this.minX, this.maxX, this.rangeX);
         // console.log('vals', this.unitX); // error when xmax - xmin <= 0; unitx = infinity
     }
+
+    // diff == 20 -> tick += 2
     
     // set min x value on graph window
     setXMin(newX) {
         if (newX < this.maxX) {
             this.minX = newX;
+
+            const tickUpdate = Math.abs(Math.floor((this.maxX - this.minX) / 10.0));
+            this.unitsPerTickX = (tickUpdate > 0) ? tickUpdate : 1;
         }
         return this.minX;
     }
@@ -50,6 +57,9 @@ export default class Graph {
     setXMax(newX) {
         if (newX > this.minX) {
             this.maxX = newX;
+
+            const tickUpdate = Math.abs(Math.floor((this.maxX - this.minX) / 10.0));
+            this.unitsPerTickX = (tickUpdate > 0) ? tickUpdate : 1;
         }
         return this.maxX;
     }
@@ -58,6 +68,9 @@ export default class Graph {
     setYMin(newY) {
         if (newY < -this.minY) {
             this.maxY = -newY;
+
+            const tickUpdate = Math.abs(Math.floor((this.maxY - this.minY) / 10.0));
+            this.unitsPerTickY = (tickUpdate > 0) ? tickUpdate : 1;
         }
         return -this.maxY;
     }
@@ -66,6 +79,9 @@ export default class Graph {
     setYMax(newY) {
         if (newY > -this.maxY) {
             this.minY = -newY;
+
+            const tickUpdate = Math.abs(Math.floor((this.maxY - this.minY) / 10.0));
+            this.unitsPerTickY = (tickUpdate > 0) ? tickUpdate : 1;
         }
         return -this.minY;
     }
@@ -81,7 +97,7 @@ export default class Graph {
         context.stroke();
         
         // draw tick marks  
-        let xPosIncrement = this.unitsPerTick * this.unitX;
+        let xPosIncrement = this.unitsPerTickX * this.unitX;
         let xPos, unit;
         context.font = this.font;
         context.textAlign = "center";
@@ -98,7 +114,7 @@ export default class Graph {
         // the y position of the x axis
         let yAxisPos = stickAxisTop ? 0 : stickAxisBottom ? this.canvas.height : this.centerY;
 
-        unit = -1 * this.unitsPerTick;
+        unit = -1 * this.unitsPerTickX;
         while (xPos > 0) {
             context.moveTo(xPos, yAxisPos - this.tickSize / 2);
             context.lineTo(xPos, yAxisPos + this.tickSize / 2);
@@ -107,13 +123,13 @@ export default class Graph {
             const yPos = this.calculateYPos(yOffsetDir, stickAxisTop, stickAxisBottom);
 
             context.fillText(unit, xPos, yPos);
-            unit -= this.unitsPerTick;
+            unit -= this.unitsPerTickX;
             xPos = Math.round(xPos - xPosIncrement);
         }
         
         // draw right tick marks  
         xPos = this.centerX + xPosIncrement;
-        unit = this.unitsPerTick;
+        unit = this.unitsPerTickX;
         while (xPos < this.canvas.width) {
             context.moveTo(xPos, yAxisPos - this.tickSize / 2);
             context.lineTo(xPos, yAxisPos + this.tickSize / 2);
@@ -122,7 +138,7 @@ export default class Graph {
             const yPos = this.calculateYPos(yOffsetDir, stickAxisTop, stickAxisBottom);
 
             context.fillText(unit, xPos, yPos);
-            unit += this.unitsPerTick;
+            unit += this.unitsPerTickX;
             xPos = Math.round(xPos + xPosIncrement);
         }
         context.restore();
@@ -139,7 +155,7 @@ export default class Graph {
         context.stroke();
         
         // draw tick marks   
-        let yPosIncrement = this.unitsPerTick * this.unitY;
+        let yPosIncrement = this.unitsPerTickY * this.unitY;
         let yPos, unit;
         context.font = this.font;
         context.textAlign = "right";
@@ -155,7 +171,7 @@ export default class Graph {
         
         let xAxisPos = stickAxisLeft ? 0 : stickAxisRight ? this.canvas.width : this.centerX;
         
-        unit = this.unitsPerTick;
+        unit = this.unitsPerTickY;
         while (yPos > 0) {
             context.moveTo(xAxisPos - this.tickSize / 2, yPos);
             context.lineTo(xAxisPos + this.tickSize / 2, yPos);
@@ -164,13 +180,13 @@ export default class Graph {
             const xPos = this.calculateXPos(unit, xOffsetDir, stickAxisLeft, stickAxisRight);
             
             context.fillText(unit, xPos, yPos);
-            unit += this.unitsPerTick;
+            unit += this.unitsPerTickY;
             yPos = Math.round(yPos - yPosIncrement);
         }
         
         // draw bottom tick marks  
         yPos = this.centerY + yPosIncrement;
-        unit = -1 * this.unitsPerTick;
+        unit = -1 * this.unitsPerTickY;
         while (yPos < this.canvas.height) {
             context.moveTo(xAxisPos - this.tickSize / 2, yPos);
             context.lineTo(xAxisPos + this.tickSize / 2, yPos);
@@ -179,7 +195,7 @@ export default class Graph {
             const xPos = this.calculateXPos(unit, xOffsetDir, stickAxisLeft, stickAxisRight);
             
             context.fillText(unit, xPos, yPos);
-            unit -= this.unitsPerTick;
+            unit -= this.unitsPerTickY;
             yPos = Math.round(yPos + yPosIncrement);
         }
         context.restore();
