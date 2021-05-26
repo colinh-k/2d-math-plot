@@ -1,12 +1,6 @@
 import Graph from './graph.js';
 
-const equationField = document.getElementById('equation-field');
-const xminField = document.getElementById('xmin');
-const xmaxField = document.getElementById('xmax');
-const yminField = document.getElementById('ymin');
-const ymaxField = document.getElementById('ymax');
-
-// variables for math parsing 
+// global variables for math parsing 
 let expression = 'sin(x)';
 let scope = {
     x: 0,
@@ -19,6 +13,12 @@ let graph;
 // window.addEventListener('hashchange', initExprFromHash);
 
 window.onload = function () {  
+    const equationField = document.getElementById('equation-field');
+    const xminField = document.getElementById('xmin');
+    const xmaxField = document.getElementById('xmax');
+    const yminField = document.getElementById('ymin');
+    const ymaxField = document.getElementById('ymax');
+    
     graph = new Graph({  
         canvasId: "graph-window",  
         minX: -10,  

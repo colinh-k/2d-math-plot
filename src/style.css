@@ -16,6 +16,15 @@ body {
     justify-content: center;
 }
 
+/* make these elements non-selectable */
+label, canvas {
+    user-select: none;
+    -moz-user-select: none;
+    -khtml-user-select: none;
+    -webkit-user-select: none;
+    -o-user-select: none;
+}
+
 #content-container input, #content-container label {
     display: block;
     font-family: sans-serif;
